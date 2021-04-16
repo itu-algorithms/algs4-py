@@ -482,22 +482,22 @@ class RedBlackBST(Generic[Key, Val]):
         if hi is None:
             raise IllegalArgumentException("second argument to keys() is None")
         queue: Queue[Key] = Queue()
-        self._keys(self._root, queue, lo, hi)
+        self._keys_range(self._root, queue, lo, hi)
         return queue
 
-    def _keys(
-        self, x: Optional[Node[Key, Val]], queue: Queue[Key], lo: Key, hi: Key
+    def _keys_range(
+        self, node: Optional[Node[Key, Val]], queue: Queue[Key], lo: Key, hi: Key
     ) -> None:
         """Adds the keys between lo and hi in the subtree rooted at x to the
         queue."""
-        if x is None:
+        if node is None:
             return
-        if lo < x.key:
-            self._keys(x.left, queue, lo, hi)
-        if not x.key < lo and x.key <= hi:
-            queue.enqueue(x.key)
-        if hi > x.key:
-            self._keys(x.right, queue, lo, hi)
+        if lo < node.key:
+            self._keys_range(node.left, queue, lo, hi)
+        if lo <= node.key <= hi:
+            queue.enqueue(node.key)
+        if hi > node.key:
+            self._keys_range(node.right, queue, lo, hi)
 
     def select(self, k: int) -> Key:
         """Return the kth smallest key in the symbol table.
@@ -559,6 +559,7 @@ class RedBlackBST(Generic[Key, Val]):
         :param hi: maximum endpoint
         :return: the number of keys in the symbol table between lo
         (inclusive) and hi (inclusive)
+        :rtype: int
         :raises IllegalArgumentException: if either lo or hi is None
 
         """

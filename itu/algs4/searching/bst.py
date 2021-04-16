@@ -280,34 +280,56 @@ class BST(Generic[Key, Val]):
         return node
 
     def keys(self) -> Queue[Key]:
-        """Returns all keys in the symbol table as a list."""
+        """Returns all keys in the symbol table.
+
+        :return: all keys in the symbol table
+
+        """
         if self.is_empty():
             return Queue()
-        return self.range_keys(self.min(), self.max())
+        return self.keys_range(self.min(), self.max())
 
     def range_keys(self, lo: Key, hi: Key) -> Queue[Key]:
-        """returns all keys in the symbol table in the given range as a list.
+        """Deprecated use keys_range(lo, hi) instead.
+        Returns all keys in the symbol table in the given range.
 
         :param lo: minimum endpoint
         :param hi: maximum endpoint
-        :return: all keys in symbol table between lo (inclusive) and hi (inclusive)
+        :return: all keys in the symbol table between lo (inclusive) and hi (inclusive)
+        :raises IllegalArgumentException: if either lo or hi is None
+        """
+        return self.keys_range(lo, hi)
+
+    def keys_range(self, lo: Key, hi: Key) -> Queue[Key]:
+        """Returns all keys in the symbol table in the given range.
+
+        :param lo: minimum endpoint
+        :param hi: maximum endpoint
+        :return: all keys in the symbol table between lo (inclusive) and hi (inclusive)
+        :raises IllegalArgumentException: if either lo or hi is None
 
         """
+        if lo is None:
+            raise IllegalArgumentException("first argument to keys() is None")
+        if hi is None:
+            raise IllegalArgumentException("second argument to keys() is None")
         queue: Queue[Key] = Queue()
-        self._range_keys(self._root, queue, lo, hi)
+        self._keys_range(self._root, queue, lo, hi)
         return queue
 
-    def _range_keys(
-        self, node: Optional[Node[Key, Val]], queue: Queue[Key], lo: Key, hi: Key
+    def _keys_range(
+            self, node: Optional[Node[Key, Val]], queue: Queue[Key], lo: Key, hi: Key
     ) -> None:
+        """Adds the keys between lo and hi in the subtree rooted at x to the
+        queue."""
         if node is None:
             return
-        elif lo < node.key:
-            self._range_keys(node.left, queue, lo, hi)
-        if not lo > node.key and not hi < node.key:
+        if lo < node.key:
+            self._keys_range(node.left, queue, lo, hi)
+        if lo <= node.key <= hi:
             queue.enqueue(node.key)
         if hi > node.key:
-            self._range_keys(node.right, queue, lo, hi)
+            self._keys_range(node.right, queue, lo, hi)
 
     def select(self, k: int) -> Key:
         """Return the kth smallest key in the symbol table.
