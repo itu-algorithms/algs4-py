@@ -294,7 +294,7 @@ class RabinKarp:
         # Modular hashing using Horner's method
         h = 0
         for j in range(0, M):
-            h = self.R * h + ord(key[j]) % self.Q
+            h = (self.R * h + ord(key[j])) % self.Q
         return h
 
 
